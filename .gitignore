@@ -1,0 +1,14 @@
+__pycache__/
+*.py[cod]
+*$py.class
+
+*.log
+
+*.png
+
+*.onnx
+*.bin
+*.data
+*.safetensors
+tokenizer/
+tokenizer_2/
