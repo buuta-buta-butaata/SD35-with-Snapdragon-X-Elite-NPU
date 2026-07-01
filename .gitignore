@@ -12,3 +12,4 @@ __pycache__/
 *.safetensors
 tokenizer/
 tokenizer_2/
+tokenizer_3/
