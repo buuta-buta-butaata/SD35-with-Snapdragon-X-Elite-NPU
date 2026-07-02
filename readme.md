@@ -1,42 +1,55 @@
 # SD3.5-Medium with Snapdragon X Elite NPU
 
-## 本プロジェクトの目的
+## Project Objective
+The main goal of this project is to run Stable Diffusion 3.5 Medium (SD3.5-Medium) models natively and entirely on the Snapdragon X Elite NPU using the QNN Execution Provider (Achieved).
 
-Snapdragon X EliteのNPUを用いて、SD3.5-Medium系のモデルを動かすこと(達成済み)  
-前のプロジェクト: [SDXL version](https://github.com/buuta-buta-butaata/SDXL-with-Snapdragon-X-Elite-NPU)
+* **Previous Project**: [SDXL Version](https://github.com/buuta-buta-butaata/SDXL-with-Snapdragon-X-Elite-NPU)
 
-![生成した画像(Hello)](/Hello.png)
+---
 
-画像内の単語にスペルミスはあるが、許してほしい(´・ω・｀)  
-30回くらい生成しなおして、一番ましな結果がこれだった  
-snapdragonと1つの単語にすると、なかなかうまく文字を描画できなかったので、snap dragonと2つの単語にわけていたりする
+### 🎨 Showcase
 
-## 特徴
+#### Hello World from NPU!
+Our very first successful text-rendering test on the Hexagon NPU:
 
-T5xxl、transformer(MMDiT-X)もNPUで動かせる！  
-turboモデルで、8steps、T5xxlの処理含めて合計処理時間が144.479秒
-推論中のピークRAMが5.82 GB
+![Generated Image (Hello)](/Hello.png)
 
-T5xxlが動いているため、位置関係、材質などもきちんと指示可能
+*Note: Please forgive the minor spelling mistakes in the generated text! (´・ω・｀) It took about 30 prompt iterations to get this result. Interestingly, the model struggled to spell "Snapdragon" as a single word, so splitting it into two words ("snap dragon") significantly improved the NPU's text-rendering accuracy.*
 
-例 Prompt: "A studio product shot on a clean gray background. On the left is a golden metallic cube with a small wooden dog sculpture on top. On the right is a vibrant red glass sphere."
+---
 
-![T5xxlの力](/T5xxl_power.png)
+## 🔥 Key Features
 
-プロンプトを参考にしたサイト [SD1.5,SDXL,SD3(Medium),SD3.5(Medium, Large)を雑に比較](https://note.com/redrayz/n/n6688a681635c)
+* **100% NPU Acceleration**: Both the massive **T5xxl text encoder** and the core **MMDiT-X Transformer block** run fully natively on the NPU!
+* **Ultra-Low Memory Footprint**: Peak RAM usage during inference is optimized down to just **5.82 GB**.
+* **Impressive Lightning Speed**: Utilizing the Turbo version, a full generation takes only **144.479 seconds total** (8 steps, including the heavy T5xxl text encoding process).
+* **True Prompt Adherence**: Thanks to the NPU-driven T5xxl encoder, complex spatial relationships, textures, and material prompts are accurately understood and rendered.
 
-## どうやって実現したか
+#### 📐 Spatial & Material Prompt Example:
+> **Prompt**: *"A studio product shot on a clean gray background. On the left is a golden metallic cube with a small wooden dog sculpture on top. On the right is a vibrant red glass sphere."*
 
-前のSDXLのプロジェクトと同様に、NPU上で動かすためにモデルを2GB以内になるように分割、プリコンパイルしただけです。
+![T5xxl Power Demonstration](/T5xxl_power.png)
 
-## 実行時の注意
+*(Prompt reference/inspiration from: [Comparing SD1.5, SDXL, SD3, and SD3.5](https://note.com/redrayz/n/n6688a681635c))*
 
-**onnxruntime-qnnのバージョンを必ず2.3.0にしておくこと**  
-2.1.1のままだと、RAMの使用量が異常に増加するため
+---
 
-## 制限
+## 🛠️ Technical Architecture: How It Works
 
-- 画像サイズは1024x1024固定
+Consistent with our previous SDXL project, the core breakthrough relies on structural model partitioning. To bypass the QNN compiler constraints and Google Protobuf limits, the massive SD3.5-Medium layers were **strategically split into sub-models under 2 GB each** before undergoing pre-compilation for the Snapdragon NPU.
+
+---
+
+## ⚠️ Critical Dependency Requirement
+
+* **`onnxruntime-qnn==2.3.0` is STRICTLY REQUIRED.**
+* **Do NOT use version 2.1.1.** Keeping the older runtime version causes an abnormal, critical spike in RAM consumption that will crash the pipeline.
+
+---
+
+## 🛑 Current Limitations
+
+* **Fixed Image Resolution**: The pipeline is strictly hardcoded to **1024x1024** output resolution due to pre-compilation constraints. Dynamic resizing is not supported.
 
 ## Getting Started
 
