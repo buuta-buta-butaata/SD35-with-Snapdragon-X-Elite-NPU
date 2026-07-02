@@ -22,7 +22,7 @@ Our very first successful text-rendering test on the Hexagon NPU:
 
 * **100% NPU Acceleration**: Both the massive **T5xxl text encoder** and the core **MMDiT-X Transformer block** run fully natively on the NPU!
 * **Ultra-Low Memory Footprint**: Peak RAM usage during inference is optimized down to just **5.82 GB**.
-* **Impressive Lightning Speed**: Utilizing the Turbo version, a full generation takes only **144.479 seconds total** (8 steps, including the heavy T5xxl text encoding process).
+* **Impressive Lightning(?) Speed**: Utilizing the Turbo version, a full generation takes only **144.479 seconds total** (8 steps, including the heavy T5xxl text encoding process).
 * **True Prompt Adherence**: Thanks to the NPU-driven T5xxl encoder, complex spatial relationships, textures, and material prompts are accurately understood and rendered.
 
 #### 📐 Spatial & Material Prompt Example:
@@ -108,6 +108,8 @@ Once the setup is complete, you can generate images by running `image_gen.bat` a
 
 #### Execution Examples
 
+```bash
 image_gen.bat "A studio product shot on a clean gray background. On the left is a golden metallic cube with a small wooden dog sculpture on top. On the right is a vibrant red glass sphere."
+```
 
 
