@@ -1,115 +1,145 @@
 # SD3.5-Medium with Snapdragon X Elite NPU
 
-## Project Objective
-The main goal of this project is to run Stable Diffusion 3.5 Medium (SD3.5-Medium) models natively and entirely on the Snapdragon X Elite NPU using the QNN Execution Provider (Achieved).
+## Project Objectives
 
-* **Previous Project**: [SDXL Version](https://github.com/buuta-buta-butaata/SDXL-with-Snapdragon-X-Elite-NPU)
+The primary objective of this project is to run Stable Diffusion 3.5 Medium (SD3.5-Medium) series models utilizing the Snapdragon X Elite NPU. (This has been successfully achieved using FP16 precision models.)
+Previous project: [SDXL version](https://github.com/buuta-buta-butaata/SDXL-with-Snapdragon-X-Elite-NPU)
 
----
+*Note: This project is strictly a Proof of Concept (PoC) focused on making the models operational on the NPU. It currently offers very little practical utility due to the significant amount of time required for image generation.*
 
-### 🎨 Showcase
+![Generated Image (Hello SD3.5 Medium with Snapdragon X Elite)](/Hello.png)
 
-#### Hello World from NPU!
-Our very first successful text-rendering test on the Hexagon NPU:
+*Please forgive the spelling mistakes in the generated text (´・ω・｀). I regenerated the image about 30 times, and this was the best result. Interestingly, the model struggled to render the text properly when combined as "snapdragon", so I split it into two words: "snap dragon".*
 
-![Generated Image (Hello)](/Hello.png)
+## Features
 
-*Note: Please forgive the minor spelling mistakes in the generated text! (´・ω・｀) It took about 30 prompt iterations to get this result. Interestingly, the model struggled to spell "Snapdragon" as a single word, so splitting it into two words ("snap dragon") significantly improved the NPU's text-rendering accuracy.*
+- **Full NPU Execution:** Both T5xxl and the Transformer (MMDiT-X) components run entirely on the NPU.
+- **Performance Benchmarks:** Using a Turbo model with 8 inference steps, the total execution time—including model loading—is **144.479 seconds**.
+- **Low Memory Footprint:** The peak RAM usage during inference is only **5.82 GB**.
+- **Accurate Text-to-Image Alignment:** Since T5xxl is fully functional, spatial relationships, materials, and other detailed instructions are accurately reflected.
 
----
+**Prompt Example:** *"A studio product shot on a clean gray background. On the left is a golden metallic cube with a small wooden dog sculpture on top. On the right is a vibrant red glass sphere."*
 
-## 🔥 Key Features
+![Power of T5xxl](/T5xxl_power.png)
 
-* **100% NPU Acceleration**: Both the massive **T5xxl text encoder** and the core **MMDiT-X Transformer block** run fully natively on the NPU!
-* **Ultra-Low Memory Footprint**: Peak RAM usage during inference is optimized down to just **5.82 GB**.
-* **Impressive Lightning(?) Speed**: Utilizing the Turbo version, a full generation takes only **144.479 seconds total** (8 steps, including the heavy T5xxl text encoding process).
-* **True Prompt Adherence**: Thanks to the NPU-driven T5xxl encoder, complex spatial relationships, textures, and material prompts are accurately understood and rendered.
+*Prompt Reference: [SD1.5,SDXL,SD3(Medium),SD3.5(Medium, Large)を雑に比較 (Rough comparison of SD1.5, SDXL, SD3, and SD3.5)](https://note.com)*
 
-#### 📐 Spatial & Material Prompt Example:
-> **Prompt**: *"A studio product shot on a clean gray background. On the left is a golden metallic cube with a small wooden dog sculpture on top. On the right is a vibrant red glass sphere."*
+## How It Was Achieved
 
-![T5xxl Power Demonstration](/T5xxl_power.png)
+Similar to the previous SDXL project, this was achieved by partitioning and pre-compiling the models into segments under 2GB to ensure compatibility and successful execution on the NPU.
 
-*(Prompt reference/inspiration from: [Comparing SD1.5, SDXL, SD3, and SD3.5](https://note.com/redrayz/n/n6688a681635c))*
+## Execution Notes
 
----
+- **Required ONNX Runtime Version:** Ensure that your `onnxruntime-qnn` version is strictly set to **2.3.0**. 
+- *Using version 2.1.1 causes an abnormal and massive spike in RAM consumption.*
 
-## 🛠️ Technical Architecture: How It Works
+## Limitations
 
-Consistent with our previous SDXL project, the core breakthrough relies on structural model partitioning. To bypass the QNN compiler constraints and Google Protobuf limits, the massive SD3.5-Medium layers were **strategically split into sub-models under 2 GB each** before undergoing pre-compilation for the Snapdragon NPU.
+- **Fixed Resolution:** The output image size is strictly limited to **1024x1024** pixels.
 
----
-
-## ⚠️ Critical Dependency Requirement
-
-* **`onnxruntime-qnn==2.3.0` is STRICTLY REQUIRED.**
-* **Do NOT use version 2.1.1.** Keeping the older runtime version causes an abnormal, critical spike in RAM consumption that will crash the pipeline.
-
----
-
-## 🛑 Current Limitations
-
-* **Fixed Image Resolution**: The pipeline is strictly hardcoded to **1024x1024** output resolution due to pre-compilation constraints. Dynamic resizing is not supported.
-
-## Getting Started
+## Usage
 
 ### Prerequisites
 
 #### System Requirements
 
-* **SoC**: Snapdragon X Elite (Strictly required, as the project is optimized specifically for this architecture).
-* **OS**: Windows 11 (ARM64).
-* **RAM**: 16 GB or higher. 
-* **Storage**: At least **25 GB of free disk space** is highly recommended. 
-  * *Reason: You need to account for both the 16 GB compiled model files and the additional allocation required for the Windows Virtual Memory (Pagefile).*
-* **Python**: Python 3.13.x (ARM64 Native).
-  * *Note: While it should theoretically run on Linux with minor script modifications, this repository currently only supports Windows.*
+- **Processor:** Snapdragon X Elite (Strictly required as this project is optimized specifically for this SoC)
+- **RAM:** 16 GB or higher (An available 8 GB of free RAM at execution is ideal, but it will run as long as you have sufficient virtual memory—8 GB or more allocated)
+- **OS:** Windows 11
+- **Python:** Python 3.13.3 (Arm64) (Any Python 3.13.X Arm64 version should work)
 
-### Setup Instructions
+#### Required Skills & Knowledge
 
-#### 1. Clone the Repository
-Clone this repository to your local machine using Git:
+- Ability to run and manage Python environments on Windows 11
+
+*Note: The following setup instructions assume a basic proficiency with Python.*
+
+*I have put together a simple execution script. It is quite a crude, "bare minimum" script just to get things running, but it gets the job done.*
+
+### Setup
+
+#### 1. Clone or Download This Repository
+Download the project files using Git or by downloading the repository directly.
+
+**Command Example:**
 ```bash
 git clone https://github.com/buuta-buta-butaata/SD35-with-Snapdragon-X-Elite-NPU.git
 cd SD35-with-Snapdragon-X-Elite-NPU
 ```
 
-#### 2. Download the Model
-You can download the pre-compiled models either via your browser or using the provided Python script.
+#### 2. Download the Models
+You can download the models either via your web browser or using the provided Python script.
+*Note: The total file size for the models is approximately 16.1 GB, so downloading will take some time.*
 
-*⚠️ **Important Note on Downloading:** The total model size is around **16 GB**. Depending on your network speed, the download may take some time (expect **15+ minutes**). Please be patient while the script fetches the files.*
+##### Option A: Via Web Browser
 
-##### Method A: Via Web Browser
-1. Go to the Hugging Face repository: [sd-3.5-medium-turbo-for-Snapdragon-X-Elite](https://huggingface.co/Buuta/sd-3.5-medium-turbo-for-Snapdragon-X-Elite/tree/main)
-2. Download the files and place them into the following directory:
-   `compiled_models\sd-3.5-medium-turbo-for-Snapdragon-X-Elite`
+Download the compiled models from the Hugging Face repository:  
+[sd-3.5-medium-turbo-for-Snapdragon-X-Elite](https://huggingface.co/Buuta/sd-3.5-medium-turbo-for-Snapdragon-X-Elite/tree/main)
 
-##### Method B: Via Python Script
-Run the built-in download script to automatically fetch the models:
-```bash
+Place all the downloaded model files into the following directory:  
+`compiled_models\sd-3.5-medium-turbo-for-Snapdragon-X-Elite`
+
+##### Option B: Via Python Script
+
+A dedicated download script is included in the repository. Run the following commands to download the models automatically:
+
+```cmd
 cd compiled_models\sd-3.5-medium-turbo-for-Snapdragon-X-Elite
 pip install -r requirements_download.txt
 python download.py
 cd ..\..
 ```
-*(The script will automatically save the models to the correct directory).*
 
-#### 3. Install Dependencies
-Ensure all required Python packages are installed:
-```bash
+#### 3. Install Python Dependencies
+
+Install the required packages using the provided `requirements.txt`:
+
+```cmd
 pip install -r requirements.txt
 ```
 
----
+### Inference (Running the Model)
 
-### Running the Text-to-Image Generation
+Once the setup is complete, you can generate images by executing `image_gen.bat`. Simply pass your prompt as an argument.
 
-Once the setup is complete, you can generate images by running `image_gen.bat` and passing your prompt as an argument. 
-
-#### Execution Examples
-
-```bash
-image_gen.bat "A studio product shot on a clean gray background. On the left is a golden metallic cube with a small wooden dog sculpture on top. On the right is a vibrant red glass sphere."
+**Execution Example (The "Hello SD3.5 Medium" image shown at the top):**
+```cmd
+image_gen.bat "a photo of a cat holding a sign that says “Hello SD3.5 with Snap dragon X Elite”" --steps 8 --cfg 1.3 --slg 1 --seed 1996858601
 ```
 
+By the way, running:
+```cmd
+image_gen.bat --help
+```
+will display a rather unenthusiastic, bare-bones explanation of the available options.
 
+
+## Known Issues
+
+### Slow Image Generation
+
+#### Transformer (MMDiT-X) takes approximately 12 seconds per step.
+While it would be interesting to see how much faster it could run with quantization, the entire model is currently 16.1 GB. Even with INT8 quantization, it will not fit within an 8 GB footprint. Therefore, keeping the entire model in RAM within a 16 GB system environment is highly impractical, and honestly, I lack the motivation to pursue it further under these constraints. Things might be different if I had a 32 GB RAM environment.
+
+#### T5xxl bottlenecked by loading times.
+Loading the T5xxl model takes **23.9 seconds**, while the subsequent inference processing takes only **0.18 seconds**. The inference itself is plenty fast, but the loading time is just way too slow (´・ω・｀).
+
+## Future Outlook
+
+Due to the issues mentioned above, I honestly thought there was no real room for further development. However, Qualcomm's announcement of GenieX has made me reconsider the practical potential of running SD3.5-Medium on the Snapdragon X Elite.
+
+GenieX supports GGUF format models. If we can utilize GGUF for T5xxl, it opens up the possibility of using an INT4 model, which would slash the file size from 9 GB down to 2.9 GB. Furthermore, if we quantize the Transformer (MMDiT-X) to INT8, its file size should drop to roughly 2.3 GB (about half its current size). 
+
+This makes it highly plausible that the entire model could fit comfortably within RAM. Even with a 16 GB RAM system, it might just barely fall into a usable range—depending on how much memory GGUF consumes during inference. At the very least, any system with 24 GB of RAM or more would have plenty of headroom, making this setup genuinely practical. GenieX definitely feels like it holds a lot of promise.
+
+## Acknowledgments
+
+This achievement was made possible once again thanks to the **Qualcomm AI Hub Workbench** and **Google Gemini**. 
+My sincere gratitude goes out to both companies for providing such incredible tools and services.
+
+## Project Contributors & Context
+
+* **The Developer** (Human)
+* **Google Gemini** (AI Collaborator)
+
+This entire project was brought to life through a tag-team effort between a human engineer determined to squeeze every drop of performance out of the NPU, and an AI co-pilot handling the heavy lifting of debugging and documentation. It stands as a testament to what human-AI synergy can achieve under tight hardware constraints.
