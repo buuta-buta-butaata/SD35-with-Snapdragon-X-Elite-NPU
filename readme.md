@@ -1,15 +1,16 @@
 # SD3.5-Medium with Snapdragon X Elite NPU
 
-## Project Objectives
-
-The primary objective of this project is to run Stable Diffusion 3.5 Medium (SD3.5-Medium) series models utilizing the Snapdragon X Elite NPU. (This has been successfully achieved using FP16 precision models.)
-Previous project: [SDXL version](https://github.com/buuta-buta-butaata/SDXL-with-Snapdragon-X-Elite-NPU)
-
-*Note: This project is strictly a Proof of Concept (PoC) focused on making the models operational on the NPU. It currently offers very little practical utility due to the significant amount of time required for image generation.*
-
 ![Generated Image (Hello SD3.5 Medium with Snapdragon X Elite)](/Hello.png)
 
 *Please forgive the spelling mistakes in the generated text (´・ω・｀). I regenerated the image about 30 times, and this was the best result. Interestingly, the model struggled to render the text properly when combined as "snapdragon", so I split it into two words: "snap dragon".*
+
+## Project Objectives
+
+The primary objective of this project is to run Stable Diffusion 3.5 Medium (SD3.5-Medium) series models utilizing the Snapdragon X Elite NPU. (This has been successfully achieved using FP16 precision models.)
+
+Previous project: [SDXL version](https://github.com/buuta-buta-butaata/SDXL-with-Snapdragon-X-Elite-NPU)
+
+*Note: This project is strictly a Proof of Concept (PoC) focused on making the models operational on the NPU. It currently offers very little practical utility due to the significant amount of time required for image generation.*
 
 ## Features
 
