@@ -73,6 +73,7 @@ class SD35Config:
             width = 1024,
             height = 1024,
             t5_cache = "",
+            debug_mode = False,
             sd35_dirs = None,
             scheduler_type = KarrasDiffusionSchedulers.EulerAncestralDiscreteScheduler,
             calib_strategy = 0,
@@ -91,6 +92,7 @@ class SD35Config:
         self.width = width
         self.height = height
         self.t5_cache = t5_cache
+        self.debug_mode = debug_mode
         self.dirs = utils.value_or_default(sd35_dirs,
                                                 SD35Dirs())
         self.scheduler_type = scheduler_type
@@ -166,7 +168,7 @@ class SD35Pipeline:
 
         peak_mem = self.get_peak_memory_gb()
         print("==================================================")
-        print(" 🛠️  MEMORY PROFILE REPORT (RAM 16GB ENV)")
+        print(" 🛠️  MEMORY PROFILE REPORT")
         print("==================================================")
         print(f" 👑 推論中のピークRAM: {peak_mem:.2f} GB")
         print("==================================================")

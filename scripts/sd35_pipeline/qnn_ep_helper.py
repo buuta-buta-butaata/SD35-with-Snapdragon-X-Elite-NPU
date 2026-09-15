@@ -14,8 +14,8 @@ selected_ep_devices = [ep_device for ep_device in all_ep_devices if ep_device.ep
 ep_options = {'backend_path': qnn_ep.get_qnn_htp_path(),
               "enable_htp_fp16_precision" : "1",
               "htp_performance_mode": "burst",
-              "skip_backend_op_validation": "1",
-              "skip_qnn_version_check": "1",
+              # "skip_backend_op_validation": "1",
+              # "skip_qnn_version_check": "1",
               # "disable_htp_monolithic_lstm": "1",
               # "enable_htp_spill_fill_buffer": "1",
               # "enable_dx12_shared_memory_allocator": "1",
@@ -29,9 +29,9 @@ session_options.add_provider_for_devices(selected_ep_devices, ep_options)
 #session_options.graph_optimization_level = ort.GraphOptimizationLevel.ORT_DISABLE_ALL
 session_options.log_severity_level = 3
 session_options.add_session_config_entry("session.disable_cpu_ep_fallback", "1")
-#session_options.enable_cpu_mem_arena = True
-#session_options.enable_mem_pattern = True
-#session_options.enable_mem_reuse = True
+session_options.enable_cpu_mem_arena = False
+session_options.enable_mem_pattern = False
+session_options.enable_mem_reuse = False
 
 # Set run options for this specific inference
 # run_options = ort.RunOptions()

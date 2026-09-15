@@ -105,13 +105,13 @@ class NpuMMDiTLoop:
                     scaled_latents_np, timestep_np,
                     encoder_hidden_states, pooled_projections,
                     save_calibration_data=False,
-                    step=i, layer_skipping=layer_skipping)
+                    step=i, layer_skipping=layer_skipping, debug_mode=config.debug_mode)
                 
                 noise_pred_uncond, _ = self.forward(
                     scaled_latents_np, timestep_np,
                     uncond_hidden_states,  uncond_pooled_projections,
                     save_calibration_data=False,
-                    step=i)
+                    step=i, debug_mode=config.debug_mode)
 
                 noise_pred = noise_pred_uncond + config.cfg_scale * (
                     noise_pred_text - noise_pred_uncond
@@ -128,7 +128,7 @@ class NpuMMDiTLoop:
                     scaled_latents_np, timestep_np,
                     encoder_hidden_states, pooled_projections,
                     save_calibration_data=False,
-                    step=i, layer_skipping=layer_skipping)
+                    step=i, layer_skipping=layer_skipping, debug_mode=config.debug_mode)
 
                 if layer_skipping:
                     noise_pred = noise_pred_text + config.slg_scale * (
@@ -163,7 +163,7 @@ class NpuMMDiTLoop:
 
         return latents_np
     
-    def forward(self, latents, timestep, hidden, pooled, save_calibration_data=False, step = 0, layer_skipping = False):
+    def forward(self, latents, timestep, hidden, pooled, save_calibration_data=False, step = 0, layer_skipping = False, debug_mode = False):
         p1_img_out = "add_144"
         p1_txt_out = "add_148"
 
@@ -202,8 +202,9 @@ class NpuMMDiTLoop:
         })
         
         # ★ Part1の出力をチェック
-        # print_stats("Part1 Out (Pos)[0] img", out_p1_pos[0])
-        # print_stats("Part1 Out (Pos)[1] txt", out_p1_pos[1])
+        if debug_mode:
+            print_stats("Part1 Out [0] img", out_p1_pos[0])
+            print_stats("Part1 Out [1] txt", out_p1_pos[1])
 
         # elapsed_time = time.perf_counter()
         # print(f"Part1 NPUでの処理にかかった時間: {elapsed_time - start_time:.3f} 秒")
@@ -225,8 +226,9 @@ class NpuMMDiTLoop:
         })
     
         # ★ Part2の出力をチェック
-        # print_stats("Part2 Out (Pos)[0] img", out_p2_pos[0])
-        # print_stats("Part2 Out (Pos)[1] txt", out_p2_pos[1])
+        if debug_mode:
+            print_stats("Part2 Out [0] img", out_p2_pos[0])
+            print_stats("Part2 Out [1] txt", out_p2_pos[1])
 
         # out_p2_pos[1] = np.clip(out_p2_pos[1], -8000, 8000) # 値を強制的に安全圏に縛る
         # out_p2_neg[1] = np.clip(out_p2_neg[1], -8000, 8000) # 値を強制的に安全圏に縛る
@@ -255,6 +257,10 @@ class NpuMMDiTLoop:
                 "pooled_projections": pooled, "timestep": timestep
             })
         del out_p2_pos, out_p1_pos
+        # ★ Part3の出力をチェック
+        if debug_mode:
+            print_stats("Part3 Out [0] img", out_p3_pos[0])
+            print_stats("Part3 Out [1] txt", out_p3_pos[1])
             
         # ------------------------------------------------
         # 【Part 4】の処理：ロード ➔ 実行 ➔ 即解放
@@ -276,9 +282,9 @@ class NpuMMDiTLoop:
             })
         del out_p3_pos
 
-        # ★ Part3（最終出力）のチェック
-        # print_stats("Part3 Out (Pos) Final", noise_pred_pos[0])
-        # print_stats("Part3 Out (Neg) Final", noise_pred_neg[0])
+        # ★ Part4（最終出力）のチェック
+        if debug_mode:
+            print_stats("Part4 Out Final", noise_pred_pos[0])
 
         # elapsed_time = time.perf_counter()
         # print(f"Part3 NPUでの処理にかかった時間: {elapsed_time - start_time:.3f} 秒")

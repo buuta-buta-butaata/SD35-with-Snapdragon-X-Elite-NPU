@@ -27,6 +27,7 @@ def parse_args():
     parser.add_argument("--slg", type=float, default=0, help="skip layer guidance scale")
     parser.add_argument("--t5_cache", choices=["save", "load"], default="", help="t5 cache")
     parser.add_argument("--output_dir", type=str, default="./outputs", help="画像出力先のディレクトリ")
+    parser.add_argument("--debug_mode", action="store_true", help="Debug mode")
     return parser.parse_args()
 
 def main():
@@ -52,6 +53,7 @@ def main():
                         slg_scale = args.slg,
                         scheduler_type = scheduler_type,
                         t5_cache = args.t5_cache,
+                        debug_mode = args.debug_mode,
                         sd35_dirs = dirs)
 
     # if args.layout == "P" or args.layout == "Portrait":
