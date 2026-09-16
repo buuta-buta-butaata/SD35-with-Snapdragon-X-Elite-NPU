@@ -47,23 +47,25 @@ class TextProcessing:
         else:
             uncond_embeds, uncond_pooled_embeds = None, None
 
-        # prompt_embeds_3 = np.zeros((1, 77, 4096), dtype=np.float16)
-        # uncond_embeds_3 = np.zeros((1, 77, 4096), dtype=np.float16)
+        if config.skip_t5:
+            prompt_embeds_3 = np.zeros((1, 77, 4096), dtype=np.float16)
+            uncond_embeds_3 = np.zeros((1, 77, 4096), dtype=np.float16)
         # Text Encoder 3 の処理 & 即時解放
         # prompt_embeds = np.zeros((1, 77, 2048), dtype=np.float16)
         # uncond_embeds = np.zeros((1, 77, 2048), dtype=np.float16)
-        if config.t5_cache != "load":
-            prompt_embeds_3, uncond_embeds_3 = self.text_encoder_3.get_text_embeddings_3(
-                config.prompt, config.negative_prompt, auto_mem_free=False)
+        else:
+            if config.t5_cache != "load":
+                prompt_embeds_3, uncond_embeds_3 = self.text_encoder_3.get_text_embeddings_3(
+                    config.prompt, config.negative_prompt, auto_mem_free=False)
 
-        if config.t5_cache == "load":
-            import tensors_io as tio
-            prompt_embeds_3 = tio.load(r"prompt_embeds_3.npy")
-            uncond_embeds_3 = tio.load(r"uncond_embeds_3.npy")
-        elif config.t5_cache == "save":
-            import tensors_io as tio
-            tio.save(r"./", "prompt_embeds_3.npy", prompt_embeds_3)
-            tio.save(r"./", "uncond_embeds_3.npy", uncond_embeds_3)
+            if config.t5_cache == "load":
+                import tensors_io as tio
+                prompt_embeds_3 = tio.load(r"prompt_embeds_3.npy")
+                uncond_embeds_3 = tio.load(r"uncond_embeds_3.npy")
+            elif config.t5_cache == "save":
+                import tensors_io as tio
+                tio.save(r"./", "prompt_embeds_3.npy", prompt_embeds_3)
+                tio.save(r"./", "uncond_embeds_3.npy", uncond_embeds_3)
 
         prompt_embeds = self.pad_for_sd35(prompt_embeds, prompt_embeds_3)
         uncond_embeds = self.pad_for_sd35(uncond_embeds, uncond_embeds_3)

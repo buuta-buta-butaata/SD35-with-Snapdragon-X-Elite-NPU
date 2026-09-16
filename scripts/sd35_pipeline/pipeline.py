@@ -72,6 +72,7 @@ class SD35Config:
             seed = -1,
             width = 1024,
             height = 1024,
+            skip_t5 = False,
             t5_cache = "",
             debug_mode = False,
             sd35_dirs = None,
@@ -91,6 +92,7 @@ class SD35Config:
         self.seed = seed
         self.width = width
         self.height = height
+        self.skip_t5 = skip_t5
         self.t5_cache = t5_cache
         self.debug_mode = debug_mode
         self.dirs = utils.value_or_default(sd35_dirs,
