@@ -18,9 +18,11 @@ def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("prompt", type=str, help="prompt")
     parser.add_argument("--prompt_2", type=str, help="prompt_2")
+    parser.add_argument("--prompt_3", type=str, help="prompt_3")
     parser.add_argument("--steps", type=int, default=8, help="steps")
     parser.add_argument("--negative_prompt", type=str, default="", help="negative prompt")
     parser.add_argument("--negative_prompt_2", type=str, default="", help="negative prompt 2")
+    parser.add_argument("--negative_prompt_3", type=str, default="", help="negative prompt 3")
     parser.add_argument("--seed", type=int, default=-1, help="seed")
     # parser.add_argument("--layout", choices=["P", "L", "Portrait", "Landscape"], default="", help="画像の形状を指定する。指定がない場合、1024x1024)")
     parser.add_argument("--cfg", type=float, default=1.5, help="classifier free guidance scale")
@@ -46,8 +48,10 @@ def main():
 
     config = SD35Config(args.prompt,
                         prompt_2 = args.prompt_2,
+                        prompt_3 = args.prompt_3,
                         negative_prompt = args.negative_prompt,
                         negative_prompt_2 = args.negative_prompt_2,
+                        negative_prompt_3 = args.negative_prompt_3,
                         seed = args.seed,
                         steps = args.steps,
                         cfg_scale = args.cfg,

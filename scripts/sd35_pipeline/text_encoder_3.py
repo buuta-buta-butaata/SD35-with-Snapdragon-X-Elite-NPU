@@ -72,16 +72,17 @@ class TextEncoder3:
         # --- [Part 1] ロード ➔ 実行 ➔ 即解放 ---
         print("-> Part 1 を処理中...")
         session_t5 = ort.InferenceSession(f"{t5_dir}/Part1/model.onnx", sess_options=qnn.session_options)
+        output_name = list(map(lambda x: x.name, session_t5.get_outputs()))[0]
 
         # elapsed_time = time.perf_counter()
         # print(f"モデルのロードにかかった時間: {elapsed_time - start_time:.3f} 秒")
         # start_time = elapsed_time
         
-        hidden_states = session_t5.run(["add_32"], {
+        hidden_states = session_t5.run([output_name], {
             "input_ids": input_ids,
             "attention_mask": attention_mask,
         })[0]
-        uncond_hidden_states = session_t5.run(["add_32"], {
+        uncond_hidden_states = session_t5.run([output_name], {
             "input_ids": uncond_input_ids,
             "attention_mask": uncond_attention_mask,
         })[0]
@@ -96,17 +97,19 @@ class TextEncoder3:
         # --- [Part 2] ---
         print("-> Part 2 を処理中...")
         session_t5 = ort.InferenceSession(f"{t5_dir}/Part2/model.onnx", sess_options=qnn.session_options)
+        input_name = output_name
+        output_name = list(map(lambda x: x.name, session_t5.get_outputs()))[0]
         
         # elapsed_time = time.perf_counter()
         # print(f"モデルのロードにかかった時間: {elapsed_time - start_time:.3f} 秒")
         # start_time = elapsed_time
 
-        hidden_states = session_t5.run(["add_60"], {
-            "add_32": hidden_states,
+        hidden_states = session_t5.run([output_name], {
+            input_name: hidden_states,
             "attention_mask": attention_mask,
         })[0]
-        uncond_hidden_states = session_t5.run(["add_60"], {
-            "add_32": uncond_hidden_states,
+        uncond_hidden_states = session_t5.run([output_name], {
+            input_name: uncond_hidden_states,
             "attention_mask": uncond_attention_mask,
         })[0]
         
@@ -120,12 +123,15 @@ class TextEncoder3:
         # --- [Part 3] ---
         print("-> Part 3 を処理中...")
         session_t5 = ort.InferenceSession(f"{t5_dir}/Part3/model.onnx", sess_options=qnn.session_options)
-        hidden_states = session_t5.run(["add_88"], {
-            "add_60": hidden_states,
+        input_name = output_name
+        output_name = list(map(lambda x: x.name, session_t5.get_outputs()))[0]
+
+        hidden_states = session_t5.run([output_name], {
+            input_name: hidden_states,
             "attention_mask": attention_mask,
         })[0]
-        uncond_hidden_states = session_t5.run(["add_88"], {
-            "add_60": uncond_hidden_states,
+        uncond_hidden_states = session_t5.run([output_name], {
+            input_name: uncond_hidden_states,
             "attention_mask": uncond_attention_mask,
         })[0]
         del session_t5
@@ -134,12 +140,15 @@ class TextEncoder3:
         # --- [Part 4] ---
         print("-> Part 4 を処理中...")
         session_t5 = ort.InferenceSession(f"{t5_dir}/Part4/model.onnx", sess_options=qnn.session_options)
-        hidden_states = session_t5.run(["add_116"], {
-            "add_88": hidden_states,
+        input_name = output_name
+        output_name = list(map(lambda x: x.name, session_t5.get_outputs()))[0]
+
+        hidden_states = session_t5.run([output_name], {
+            input_name: hidden_states,
             "attention_mask": attention_mask,
         })[0]
-        uncond_hidden_states = session_t5.run(["add_116"], {
-            "add_88": uncond_hidden_states,
+        uncond_hidden_states = session_t5.run([output_name], {
+            input_name: uncond_hidden_states,
             "attention_mask": uncond_attention_mask,
         })[0]
         del session_t5
@@ -148,12 +157,15 @@ class TextEncoder3:
         # --- [Part 5] ---
         print("-> Part 5 を処理中...")
         session_t5 = ort.InferenceSession(f"{t5_dir}/Part5/model.onnx", sess_options=qnn.session_options)
-        hidden_states = session_t5.run(["add_144"], {
-            "add_116": hidden_states,
+        input_name = output_name
+        output_name = list(map(lambda x: x.name, session_t5.get_outputs()))[0]
+
+        hidden_states = session_t5.run([output_name], {
+            input_name: hidden_states,
             "attention_mask": attention_mask,
         })[0]
-        uncond_hidden_states = session_t5.run(["add_144"], {
-            "add_116": uncond_hidden_states,
+        uncond_hidden_states = session_t5.run([output_name], {
+            input_name: uncond_hidden_states,
             "attention_mask": uncond_attention_mask,
         })[0]
         del session_t5
@@ -162,12 +174,15 @@ class TextEncoder3:
         # --- [Part 6] ---
         print("-> Part 6 を処理中...")
         session_t5 = ort.InferenceSession(f"{t5_dir}/Part6/model.onnx", sess_options=qnn.session_options)
-        t5_outputs = session_t5.run(["hidden_states"], {
-            "add_144": hidden_states,
+        input_name = output_name
+        output_name = list(map(lambda x: x.name, session_t5.get_outputs()))[0]
+
+        t5_outputs = session_t5.run([output_name], {
+            input_name: hidden_states,
             "attention_mask": attention_mask,
         })[0]
-        uncond_t5_outputs = session_t5.run(["hidden_states"], {
-            "add_144": uncond_hidden_states,
+        uncond_t5_outputs = session_t5.run([output_name], {
+            input_name: uncond_hidden_states,
             "attention_mask": uncond_attention_mask,
         })[0]
         del session_t5

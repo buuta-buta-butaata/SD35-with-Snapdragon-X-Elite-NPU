@@ -56,7 +56,7 @@ class TextProcessing:
         else:
             if config.t5_cache != "load":
                 prompt_embeds_3, uncond_embeds_3 = self.text_encoder_3.get_text_embeddings_3(
-                    config.prompt, config.negative_prompt, auto_mem_free=False)
+                    config.prompt_3, config.negative_prompt_3, auto_mem_free=False)
 
             if config.t5_cache == "load":
                 import tensors_io as tio

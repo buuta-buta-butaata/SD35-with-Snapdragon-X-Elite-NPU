@@ -64,8 +64,10 @@ class SD35Config:
             self,
             prompt,
             prompt_2 = None,
+            prompt_3 = None,
             negative_prompt = "",
             negative_prompt_2 = None,
+            negative_prompt_3 = None,
             steps = 20,
             cfg_scale = 5.0,
             slg_scale = 0,
@@ -83,8 +85,12 @@ class SD35Config:
         self.prompt = prompt
         self.prompt_2 = utils.value_or_default(prompt_2,
                                                prompt)
+        self.prompt_3 = utils.value_or_default(prompt_3,
+                                               prompt)
         self.negative_prompt = negative_prompt
         self.negative_prompt_2 = utils.value_or_default(negative_prompt_2,
+                                                        negative_prompt)
+        self.negative_prompt_3 = utils.value_or_default(negative_prompt_3,
                                                         negative_prompt)
         self.steps = steps
         self.cfg_scale = cfg_scale
