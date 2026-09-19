@@ -67,8 +67,8 @@ class TextProcessing:
                 tio.save(r"./", "prompt_embeds_3.npy", prompt_embeds_3)
                 tio.save(r"./", "uncond_embeds_3.npy", uncond_embeds_3)
 
-        prompt_embeds = self.pad_for_sd35(prompt_embeds, prompt_embeds_3)
-        uncond_embeds = self.pad_for_sd35(uncond_embeds, uncond_embeds_3)
+        prompt_embeds = self.pad_for_sd35(prompt_embeds, prompt_embeds_3 * config.t5_strength)
+        uncond_embeds = self.pad_for_sd35(uncond_embeds, uncond_embeds_3 * config.t5_strength)
 
         # print(prompt_embeds)
 

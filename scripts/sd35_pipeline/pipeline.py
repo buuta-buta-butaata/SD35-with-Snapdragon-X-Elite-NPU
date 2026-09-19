@@ -74,6 +74,7 @@ class SD35Config:
             seed = -1,
             width = 1024,
             height = 1024,
+            t5_strength = 1.0,
             skip_t5 = False,
             t5_cache = "",
             debug_mode = False,
@@ -98,6 +99,7 @@ class SD35Config:
         self.seed = seed
         self.width = width
         self.height = height
+        self.t5_strength = t5_strength
         self.skip_t5 = skip_t5
         self.t5_cache = t5_cache
         self.debug_mode = debug_mode

@@ -183,6 +183,11 @@ class NpuMMDiTLoop:
             has_inf = np.isinf(arr).any()
             print(f"  [{name}] Shape: {arr.shape} | Mean: {arr.mean():.4f} | Max: {arr.max():.4f} | Min: {arr.min():.4f} | NaN: {has_nan} | Inf: {has_inf}")
 
+        def nan_to_num(tensor):
+            tensor[0] = np.nan_to_num(tensor[0])
+            tensor[1] = np.nan_to_num(tensor[1])
+            return tensor
+
         # print(f"\n=== MMDiT 内部統計チェック (Timestep: {timestep}) ===")
         # print_stats("Input: latents", latents)
 
@@ -200,7 +205,8 @@ class NpuMMDiTLoop:
             "hidden_states": latents, "encoder_hidden_states": hidden,
             "pooled_projections": pooled, "timestep": timestep
         })
-        
+
+        out_p1_pos = nan_to_num(out_p1_pos)
         # ★ Part1の出力をチェック
         if debug_mode:
             print_stats("Part1 Out [0] img", out_p1_pos[0])
@@ -225,6 +231,7 @@ class NpuMMDiTLoop:
             "pooled_projections": pooled, "timestep": timestep
         })
     
+        out_p2_pos = nan_to_num(out_p2_pos)
         # ★ Part2の出力をチェック
         if debug_mode:
             print_stats("Part2 Out [0] img", out_p2_pos[0])
@@ -256,7 +263,9 @@ class NpuMMDiTLoop:
                 p2_img_out: out_p1_pos[0], p2_txt_out: out_p1_pos[1],
                 "pooled_projections": pooled, "timestep": timestep
             })
+            out_p3_pos_skip = nan_to_num(out_p3_pos_skip)
         del out_p2_pos, out_p1_pos
+        out_p3_pos = nan_to_num(out_p3_pos)
         # ★ Part3の出力をチェック
         if debug_mode:
             print_stats("Part3 Out [0] img", out_p3_pos[0])
@@ -280,8 +289,10 @@ class NpuMMDiTLoop:
                 p3_img_out: out_p3_pos_skip[0], p3_txt_out: out_p3_pos_skip[1],
                 "pooled_projections": pooled, "timestep": timestep
             })
+            noise_pred_pos_skip[0] = np.nan_to_num(noise_pred_pos_skip[0])
         del out_p3_pos
 
+        noise_pred_pos[0] = np.nan_to_num(noise_pred_pos[0])
         # ★ Part4（最終出力）のチェック
         if debug_mode:
             print_stats("Part4 Out Final", noise_pred_pos[0])

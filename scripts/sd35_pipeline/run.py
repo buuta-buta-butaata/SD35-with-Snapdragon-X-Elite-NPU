@@ -27,6 +27,7 @@ def parse_args():
     # parser.add_argument("--layout", choices=["P", "L", "Portrait", "Landscape"], default="", help="画像の形状を指定する。指定がない場合、1024x1024)")
     parser.add_argument("--cfg", type=float, default=1.5, help="classifier free guidance scale")
     parser.add_argument("--slg", type=float, default=0, help="skip layer guidance scale")
+    parser.add_argument("--t5_strength", type=float, default=1.0, help="t5 strength")
     parser.add_argument("--skip_t5", action="store_true", help="skip t5")
     parser.add_argument("--t5_cache", choices=["save", "load"], default="", help="t5 cache")
     parser.add_argument("--output_dir", type=str, default="./outputs", help="画像出力先のディレクトリ")
@@ -57,6 +58,7 @@ def main():
                         cfg_scale = args.cfg,
                         slg_scale = args.slg,
                         scheduler_type = scheduler_type,
+                        t5_strength = args.t5_strength,
                         skip_t5 = args.skip_t5,
                         t5_cache = args.t5_cache,
                         debug_mode = args.debug_mode,
