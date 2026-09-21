@@ -109,7 +109,7 @@ class TextEncoder3:
         })[0]
         del session_t5
         gc.collect()
-        
+
         hidden_states = self.clean(hidden_states)
         uncond_hidden_states = self.clean(uncond_hidden_states)
 
@@ -123,7 +123,9 @@ class TextEncoder3:
         return hidden_states, uncond_hidden_states, output_name
 
     def clean(self, nparray):
-        nparray = np.nan_to_num(nparray)
+        if np.isnan(nparray).any():
+            print("Detected NaN, fixed")
+            nparray = np.nan_to_num(nparray)
         # nparray = np.where(np.isnan(nparray), 0.0, nparray)
         return nparray
 
