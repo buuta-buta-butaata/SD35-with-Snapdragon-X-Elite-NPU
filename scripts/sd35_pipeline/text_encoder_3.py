@@ -110,11 +110,22 @@ class TextEncoder3:
         del session_t5
         gc.collect()
         
+        hidden_states = self.clean(hidden_states)
+        uncond_hidden_states = self.clean(uncond_hidden_states)
+
         print_stats(f"Part{part_num} Pos Out", hidden_states)
         print_stats(f"Part{part_num} Neg Out", uncond_hidden_states)
 
+        # pos = np.isin(np.array([0]), hidden_states)
+        # neg = np.isin(np.array([0]), uncond_hidden_states)
+        # print(pos, neg)
+
         return hidden_states, uncond_hidden_states, output_name
 
+    def clean(self, nparray):
+        nparray = np.nan_to_num(nparray)
+        # nparray = np.where(np.isnan(nparray), 0.0, nparray)
+        return nparray
 
 if __name__ == "__main__":
     # 単体テスト用
