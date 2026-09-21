@@ -75,6 +75,8 @@ class SD35Config:
             width = 1024,
             height = 1024,
             t5_strength = 1.0,
+            use_t5_cpu = False,
+            use_bfloat = False,
             skip_t5 = False,
             t5_cache = "",
             debug_mode = False,
@@ -100,6 +102,8 @@ class SD35Config:
         self.width = width
         self.height = height
         self.t5_strength = t5_strength
+        self.use_t5_cpu = use_t5_cpu
+        self.use_bfloat = use_bfloat
         self.skip_t5 = skip_t5
         self.t5_cache = t5_cache
         self.debug_mode = debug_mode
@@ -128,6 +132,8 @@ class SD35Pipeline:
                                          self.config.dirs.tokenizer_2_dir,
                                          self.config.dirs.text_encoder_3_dir,
                                          self.config.dirs.tokenizer_3_dir,
+                                         self.config.use_t5_cpu,
+                                         self.config.use_bfloat,
                                          )
 
         prompt_embeds, pooled_prompt_embeds, uncond_embeds, uncond_pooled_embeds = text_processing.encode_text(self.config)

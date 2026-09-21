@@ -2,6 +2,16 @@ from PIL import Image
 import numpy as np
 import torch
 
+def print_stats(name, tensor):
+    """テンソルの健全性をチェックする補助関数"""
+    # ndarrayでない（リストやタプルの）場合は最初の要素を対象にする
+    if isinstance(tensor, (list, tuple)):
+        tensor = tensor[0]
+    arr = np.array(tensor, dtype=np.float32)
+    has_nan = np.isnan(arr).any()
+    has_inf = np.isinf(arr).any()
+    print(f"  [{name}] Shape: {arr.shape} | Mean: {arr.mean():.4f} | Max: {arr.max():.4f} | Min: {arr.min():.4f} | NaN: {has_nan} | Inf: {has_inf}")
+
 def value_or_default(value, default_value):
     return default_value if value is None else value
 

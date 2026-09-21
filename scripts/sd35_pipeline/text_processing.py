@@ -6,10 +6,10 @@ from text_encoder_3 import TextEncoder3
 
 class TextProcessing:
     def __init__(self, text_encoder_dir, tokenizer_dir, text_encoder_2_dir, tokenizer_2_dir,
-                 text_encoder_3_dir, tokenizer_3_dir):
+                 text_encoder_3_dir, tokenizer_3_dir, use_t5_cpu=False, use_bfloat=False):
         self.text_encoder = TextEncoder(text_encoder_dir, tokenizer_dir)
         self.text_encoder_2 = TextEncoder2(text_encoder_2_dir, tokenizer_2_dir)
-        self.text_encoder_3 = TextEncoder3(text_encoder_3_dir, tokenizer_3_dir)
+        self.text_encoder_3 = TextEncoder3(text_encoder_3_dir, tokenizer_3_dir, use_t5_cpu, use_bfloat)
         return
 
     def _encode_text(self, prompt, prompt_2):

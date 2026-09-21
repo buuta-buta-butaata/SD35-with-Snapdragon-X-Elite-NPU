@@ -28,6 +28,8 @@ def parse_args():
     parser.add_argument("--cfg", type=float, default=1.5, help="classifier free guidance scale")
     parser.add_argument("--slg", type=float, default=0, help="skip layer guidance scale")
     parser.add_argument("--t5_strength", type=float, default=1.0, help="t5 strength")
+    parser.add_argument("--use_t5_cpu", action="store_true", help="use t5 cpu version")
+    parser.add_argument("--use_bfloat", action="store_true", help="Enable Bfloat16 precision on T5xxl")
     parser.add_argument("--skip_t5", action="store_true", help="skip t5")
     parser.add_argument("--t5_cache", choices=["save", "load"], default="", help="t5 cache")
     parser.add_argument("--output_dir", type=str, default="./outputs", help="画像出力先のディレクトリ")
@@ -59,6 +61,8 @@ def main():
                         slg_scale = args.slg,
                         scheduler_type = scheduler_type,
                         t5_strength = args.t5_strength,
+                        use_t5_cpu = args.use_t5_cpu,
+                        use_bfloat = args.use_bfloat,
                         skip_t5 = args.skip_t5,
                         t5_cache = args.t5_cache,
                         debug_mode = args.debug_mode,

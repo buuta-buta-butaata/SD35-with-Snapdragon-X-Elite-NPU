@@ -6,17 +6,14 @@ from datetime import datetime
 import numpy as np
 import onnxruntime as ort
 import torch
+import time
 
 from tqdm.auto import tqdm
 
 import qnn_ep_helper as qnn
 from schedulers import Scheduler
 #from calib_data_collector import CalibrationDataCollector
-
-import time
-
-import threading
-import queue
+from utils import print_stats
 
 class NpuMMDiTLoop:
     def __init__(self, config):
@@ -173,16 +170,6 @@ class NpuMMDiTLoop:
         p3_img_out = "add_334"
         p3_txt_out = "add_338"
         
-        def print_stats(name, tensor):
-            """テンソルの健全性をチェックする補助関数"""
-            # ndarrayでない（リストやタプルの）場合は最初の要素を対象にする
-            if isinstance(tensor, (list, tuple)):
-                tensor = tensor[0]
-            arr = np.array(tensor, dtype=np.float32)
-            has_nan = np.isnan(arr).any()
-            has_inf = np.isinf(arr).any()
-            print(f"  [{name}] Shape: {arr.shape} | Mean: {arr.mean():.4f} | Max: {arr.max():.4f} | Min: {arr.min():.4f} | NaN: {has_nan} | Inf: {has_inf}")
-
         def nan_to_num(tensor):
             tensor[0] = np.nan_to_num(tensor[0])
             tensor[1] = np.nan_to_num(tensor[1])

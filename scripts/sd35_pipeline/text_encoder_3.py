@@ -3,16 +3,21 @@ import os
 import numpy as np
 import onnxruntime as ort
 import qnn_ep_helper as qnn
+import qnn_ep_helper_use_bfloat as qnn_bfloat
 from transformers import AutoTokenizer
 
 import time
 
+from utils import print_stats
+
 class TextEncoder3:
-    def __init__(self, text_encoder_3_dir, tokenizer_3_dir):
+    def __init__(self, text_encoder_3_dir, tokenizer_3_dir, use_cpu=False, use_bfloat=False):
         self.tokenizer_3 = None
         # self.model_3 = None
         self.model_path = os.path.join(text_encoder_3_dir)
         self.tokenizer_3_path = tokenizer_3_dir
+        self.use_cpu = use_cpu
+        self.use_bfloat = use_bfloat
 
     def get_tokens(self, prompt):
         # 1. ローカルフォルダからトークナイザー3をロード
@@ -57,138 +62,58 @@ class TextEncoder3:
         del self.tokenizer_3
         gc.collect()
 
+    def get_t5_session(self, onnx_path, is_cpu_session=False, use_bfloat=False):
+        if is_cpu_session:
+            session = ort.InferenceSession(onnx_path, providers=['CPUExecutionProvider'])
+            return session
+        options = qnn_bfloat.session_options if use_bfloat else qnn.session_options
+        session = ort.InferenceSession(onnx_path, sess_options=options)
+        return session
+        
     #def t5_pipeline(self, input_ids_3, attention_mask, uncond_input_ids_3, uncond_attention_mask):
     def t5_pipeline(self, input_ids, attention_mask, uncond_input_ids, uncond_attention_mask):
-        # NPUが求める int32 形式に型を整えます
-        # input_ids = input_ids_3.astype(np.int32)
-        # uncond_input_ids = uncond_input_ids_3.astype(np.int32)
-        t5_dir = self.model_path
-         
         print("=== 6分割 T5-XXL によるテキスト処理を開始します ===")
          
-        # print("T5 処理時間計測開始")
-        # start_time = time.perf_counter()
-        
-        # --- [Part 1] ロード ➔ 実行 ➔ 即解放 ---
-        print("-> Part 1 を処理中...")
-        session_t5 = ort.InferenceSession(f"{t5_dir}/Part1/model.onnx", sess_options=qnn.session_options)
-        output_name = list(map(lambda x: x.name, session_t5.get_outputs()))[0]
-
-        # elapsed_time = time.perf_counter()
-        # print(f"モデルのロードにかかった時間: {elapsed_time - start_time:.3f} 秒")
-        # start_time = elapsed_time
-        
-        hidden_states = session_t5.run([output_name], {
-            "input_ids": input_ids,
-            "attention_mask": attention_mask,
-        })[0]
-        uncond_hidden_states = session_t5.run([output_name], {
-            "input_ids": uncond_input_ids,
-            "attention_mask": uncond_attention_mask,
-        })[0]
-        
-        # elapsed_time = time.perf_counter()
-        # print(f"NPUでの処理にかかった時間: {elapsed_time - start_time:.3f} 秒")
-        # start_time = elapsed_time
-        
-        del session_t5
-        gc.collect()
-
-        # --- [Part 2] ---
-        print("-> Part 2 を処理中...")
-        session_t5 = ort.InferenceSession(f"{t5_dir}/Part2/model.onnx", sess_options=qnn.session_options)
-        input_name = output_name
-        output_name = list(map(lambda x: x.name, session_t5.get_outputs()))[0]
-        
-        # elapsed_time = time.perf_counter()
-        # print(f"モデルのロードにかかった時間: {elapsed_time - start_time:.3f} 秒")
-        # start_time = elapsed_time
-
-        hidden_states = session_t5.run([output_name], {
-            input_name: hidden_states,
-            "attention_mask": attention_mask,
-        })[0]
-        uncond_hidden_states = session_t5.run([output_name], {
-            input_name: uncond_hidden_states,
-            "attention_mask": uncond_attention_mask,
-        })[0]
-        
-        # elapsed_time = time.perf_counter()
-        # print(f"NPUでの処理にかかった時間: {elapsed_time - start_time:.3f} 秒")
-        # start_time = elapsed_time
-        
-        del session_t5
-        gc.collect()
-         
-        # --- [Part 3] ---
-        print("-> Part 3 を処理中...")
-        session_t5 = ort.InferenceSession(f"{t5_dir}/Part3/model.onnx", sess_options=qnn.session_options)
-        input_name = output_name
-        output_name = list(map(lambda x: x.name, session_t5.get_outputs()))[0]
-
-        hidden_states = session_t5.run([output_name], {
-            input_name: hidden_states,
-            "attention_mask": attention_mask,
-        })[0]
-        uncond_hidden_states = session_t5.run([output_name], {
-            input_name: uncond_hidden_states,
-            "attention_mask": uncond_attention_mask,
-        })[0]
-        del session_t5
-        gc.collect()
-         
-        # --- [Part 4] ---
-        print("-> Part 4 を処理中...")
-        session_t5 = ort.InferenceSession(f"{t5_dir}/Part4/model.onnx", sess_options=qnn.session_options)
-        input_name = output_name
-        output_name = list(map(lambda x: x.name, session_t5.get_outputs()))[0]
-
-        hidden_states = session_t5.run([output_name], {
-            input_name: hidden_states,
-            "attention_mask": attention_mask,
-        })[0]
-        uncond_hidden_states = session_t5.run([output_name], {
-            input_name: uncond_hidden_states,
-            "attention_mask": uncond_attention_mask,
-        })[0]
-        del session_t5
-        gc.collect()
-         
-        # --- [Part 5] ---
-        print("-> Part 5 を処理中...")
-        session_t5 = ort.InferenceSession(f"{t5_dir}/Part5/model.onnx", sess_options=qnn.session_options)
-        input_name = output_name
-        output_name = list(map(lambda x: x.name, session_t5.get_outputs()))[0]
-
-        hidden_states = session_t5.run([output_name], {
-            input_name: hidden_states,
-            "attention_mask": attention_mask,
-        })[0]
-        uncond_hidden_states = session_t5.run([output_name], {
-            input_name: uncond_hidden_states,
-            "attention_mask": uncond_attention_mask,
-        })[0]
-        del session_t5
-        gc.collect()
-
-        # --- [Part 6] ---
-        print("-> Part 6 を処理中...")
-        session_t5 = ort.InferenceSession(f"{t5_dir}/Part6/model.onnx", sess_options=qnn.session_options)
-        input_name = output_name
-        output_name = list(map(lambda x: x.name, session_t5.get_outputs()))[0]
-
-        t5_outputs = session_t5.run([output_name], {
-            input_name: hidden_states,
-            "attention_mask": attention_mask,
-        })[0]
-        uncond_t5_outputs = session_t5.run([output_name], {
-            input_name: uncond_hidden_states,
-            "attention_mask": uncond_attention_mask,
-        })[0]
-        del session_t5
-        gc.collect()
+        hidden_states, uncond_hidden_states, output_name = self.run_part(1, "input_ids", input_ids, attention_mask,
+                                                                         uncond_input_ids, uncond_attention_mask)
+        hidden_states, uncond_hidden_states, output_name = self.run_part(2, output_name, hidden_states, attention_mask,
+                                                                         uncond_hidden_states, uncond_attention_mask)
+        hidden_states, uncond_hidden_states, output_name = self.run_part(3, output_name, hidden_states, attention_mask,
+                                                                         uncond_hidden_states, uncond_attention_mask)
+        hidden_states, uncond_hidden_states, output_name = self.run_part(4, output_name, hidden_states, attention_mask,
+                                                                         uncond_hidden_states, uncond_attention_mask)
+        hidden_states, uncond_hidden_states, output_name = self.run_part(5, output_name, hidden_states, attention_mask,
+                                                                         uncond_hidden_states, uncond_attention_mask)
+        t5_outputs, uncond_t5_outputs, _ = self.run_part(6, output_name, hidden_states, attention_mask,
+                                                         uncond_hidden_states, uncond_attention_mask)
 
         return t5_outputs.astype(np.float16), uncond_t5_outputs.astype(np.float16)
+
+    def run_part(self, part_num, input_name, hidden_states, attention_mask, uncond_hidden_states, uncond_attention_mask):
+        t5_dir = self.model_path
+        print(f"-> Part {part_num} を処理中...")
+        if self.use_cpu:
+            model_path = rf"{t5_dir}/part{part_num}.onnx"
+        else:
+            model_path = rf"{t5_dir}/Part{part_num}/model.onnx"
+        session_t5 = self.get_t5_session(model_path, self.use_cpu, self.use_bfloat)
+        output_name = list(map(lambda x: x.name, session_t5.get_outputs()))[0]
+
+        hidden_states = session_t5.run([output_name], {
+            input_name: hidden_states,
+            "attention_mask": attention_mask,
+        })[0]
+        uncond_hidden_states = session_t5.run([output_name], {
+            input_name: uncond_hidden_states,
+            "attention_mask": uncond_attention_mask,
+        })[0]
+        del session_t5
+        gc.collect()
+        
+        print_stats(f"Part{part_num} Pos Out", hidden_states)
+        print_stats(f"Part{part_num} Neg Out", uncond_hidden_states)
+
+        return hidden_states, uncond_hidden_states, output_name
 
 
 if __name__ == "__main__":
